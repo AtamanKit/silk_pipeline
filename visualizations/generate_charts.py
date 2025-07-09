@@ -1,8 +1,8 @@
 import os
 import matplotlib.pyplot as plt
 from collections import Counter
-from datetime import datetime
 from typing import List
+from matplotlib.ticker import MaxNLocator
 from models import NormalizedHost
 
 
@@ -17,15 +17,34 @@ def plot_vendor_distribution(hosts: List[NormalizedHost], save_dir: str = "visua
     plt.close()
 
 
+def simplify_os_name(full_os_name: str) -> str:
+    """Simplify OS names for visualization clarity."""
+    name = full_os_name.lower()
+    if "windows server 2019" in name:
+        return "Windows Server 2019"
+    elif "amazon linux 2" in name:
+        return "Amazon Linux 2"
+    elif "ubuntu" in name:
+        return "Ubuntu"
+    elif "mac" in name or "ventura" in name:
+        return "macOS"
+    elif "windows" in name:
+        return "Other Windows"
+    else:
+        return full_os_name.split()[0].capitalize()
+
 def plot_os_distribution(hosts: List[NormalizedHost], save_dir: str = "visualizations/charts"):
     os.makedirs(save_dir, exist_ok=True)
-    os_counts = Counter([host.os for host in hosts])
+    # Apply simplification
+    simplified_names = [simplify_os_name(host.os) for host in hosts]
+    os_counts = Counter(simplified_names)
 
     plt.figure(figsize=(8, 6))
     plt.bar(os_counts.keys(), os_counts.values(), color='skyblue')
     plt.xticks(rotation=45, ha='right')
     plt.title("Operating System Distribution")
     plt.ylabel("Number of Hosts")
+    plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
     plt.tight_layout()
     plt.savefig(os.path.join(save_dir, "os_distribution.png"))
     plt.close()
@@ -40,10 +59,11 @@ def plot_last_seen_timeline(hosts: List[NormalizedHost], save_dir: str = "visual
     x, y = zip(*sorted_dates)
 
     plt.figure(figsize=(10, 5))
-    plt.plot(x, y, marker='o', linestyle='-', color='green')
+    plt.plot(x, y, marker='o', linestyle='None', color='green', markersize=10)
     plt.title("Hosts Seen Over Time")
     plt.xlabel("Date")
     plt.ylabel("Host Count")
+    plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.savefig(os.path.join(save_dir, "last_seen_timeline.png"))

@@ -5,7 +5,7 @@ from typing import Optional
 class BaseAPIClient:
     BASE_URL: str
     TOKEN: str
-    LIMIT: int = 100
+    LIMIT: int = 1
 
     def __init__(self, token: str):
         self.TOKEN = token
@@ -21,6 +21,6 @@ class BaseAPIClient:
             )
             response.raise_for_status()
             return response.json()
-        except requests.ResquestException as e:
+        except requests.RequestException as e:
             print(f"API request failed: {e}")
             return None

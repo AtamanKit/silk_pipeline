@@ -30,6 +30,13 @@ class MongoDBClient:
         for host in hosts:
             # Convert model to dict
             doc = host.dict()
+
+            # Convert IP address objects to strings
+            doc["ip_addresses"] = [str(ip) for ip in doc.get("ip_addresses", [])]
+
+            # Convert MAC address objects to strings (if they are not already)
+            doc["mac_addresses"] = [str(mac) for mac in doc.get("mac_addresses", [])]
+            
             # Perform an upsert (replace if exists, insert otherwise)
             self.collection.update_one(
                 {"hostname": host.hostname, "vendor": host.vendor},

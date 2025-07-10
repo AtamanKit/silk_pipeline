@@ -5,13 +5,13 @@ This project fetches host data from Qualys and Crowdstrike APIs, normalizes the 
 ## How to Run
 
 1. Clone the repo and copy `.env.example` to `.env`
-2. Set API tokens in `.env`
-3. Run the pipeline:
+2. Run the pipeline:
 
 ```bash
 docker compose up -d --build
 docker compose logs -f app
 ```
+
 ![Screenshot](screenshots/docker_logs.png)
 
 ## Visualizations `(./visualizations/charts)`

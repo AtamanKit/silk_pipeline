@@ -16,6 +16,3 @@ RUN pip install -r requirements.txt
 
 # Copy the entire project into the container
 COPY . .
-
-# Set default command (can be overridden by compose.yaml)
-CMD ["python", "main.py"]

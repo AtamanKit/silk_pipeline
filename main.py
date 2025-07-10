@@ -1,16 +1,23 @@
-import os
+import os, sys, itertools, threading, time
+import asyncio # added for async MongoDB operations
 from dotenv import load_dotenv
 
 from api_clients import QualysClient, CrowdstrikeClient
 from normalizers import QualysNormalizer, CrowdstrikeNormalizer
 from deduplicator import HostDeduplicator
-from db import MongoDBClient
+# from db import MongoDBClient
+from db import AsyncMongoDBClient # Updated to use async MongoDB client  
 from visualizations.generate_charts import generate_all_charts
-from models import NormalizedHost
+# from models import NormalizedHost
 
 load_dotenv()
 
-def main():
+def spinner():
+    for char in itertools.cycle('|/-\\'):
+        print(f'\r Working... still in progress... {char}', flush=True)
+        time.sleep(5)
+
+async def main():
     # Load API tokens from environment
     token_qualys = os.getenv("API_TOKEN_QUALYS")
     token_crowdstrike = os.getenv("API_TOKEN_CROWDSTRIKE")
@@ -43,8 +50,10 @@ def main():
     print(f"After deduplication: {len(unique_hosts)} unique hosts")
 
     # Save to MongoDB
-    db = MongoDBClient()
-    db.save_hosts(unique_hosts)
+    # db = MongoDBClient()
+    db = AsyncMongoDBClient()  # Use async MongoDB client
+    # db.save_hosts(unique_hosts)
+    await db.save_hosts(unique_hosts)  # Save hosts asynchronously
     print("Saved hosts to MongoDB")
 
     # Generate visualizations
@@ -52,4 +61,5 @@ def main():
     print("Generated charts in visualizations/charts/")
 
 if __name__ == "__main__":
-    main()
+    threading.Thread(target=spinner, daemon=True).start()
+    asyncio.run(main())

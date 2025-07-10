@@ -1,1 +1,1 @@
-from .mongo import MongoDBClient
+from .motor_client import AsyncMongoDBClient
